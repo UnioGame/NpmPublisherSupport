@@ -1,11 +1,10 @@
 {
     "name": "NpmPublisherSupport.Editor",
     "references": [
-        "Unity.EditorCoroutines.Editor",
         "NpmPackageLoader",
-        "NpmPackageLoader.Editor"
+        "NpmPackageLoader.Editor",
+        "Unity.EditorCoroutines.Editor"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [
         "Editor"
     ],
@@ -15,5 +14,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }
