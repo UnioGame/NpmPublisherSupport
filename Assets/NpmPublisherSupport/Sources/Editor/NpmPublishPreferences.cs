@@ -5,15 +5,16 @@ namespace NpmPublisherSupport
 {
     public static class NpmPublishPreferences
     {
-        private const string RegistryPrefKey = "codewriter.npm-publisher-support.registry";
-        private const string AllRegistriesPrefKey = "codewriter.npm-publisher-support.all-registries";
-        private const string UpdateVersionRecursivelyPrefKey = "codewriter.npm-publisher-support.update-recursively";
+        public const string RegistryPrefKey = "codewriter.npm-publisher-support.registry";
+        public const string AllRegistriesPrefKey = "codewriter.npm-publisher-support.all-registries";
+        public const string UpdateVersionRecursivelyPrefKey = "codewriter.npm-publisher-support.update-recursively";
+        public const string NodeJsLocationKey = "codewriter.npm-publisher-support.node_js_location";
 
         public static string NpmPackageLoader => "com.codewriter.npm-package-loader";
 
         public static string Registry
         {
-            get => EditorPrefs.GetString(RegistryPrefKey, "");
+            get => EditorPrefs.GetString(RegistryPrefKey, string.Empty);
             set
             {
                 EditorPrefs.SetString(RegistryPrefKey, value);
@@ -26,6 +27,12 @@ namespace NpmPublisherSupport
                 }
             }
         }
+
+        public static string NodeJsLocation
+        {
+            get => EditorPrefs.GetString(NodeJsLocationKey,string.Empty);
+            set => EditorPrefs.SetString(NodeJsLocationKey,value);
+        } 
 
         public static string[] AllRegistries
         {

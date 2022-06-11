@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Text;
 using UnityEngine;
 
@@ -8,6 +9,8 @@ namespace NpmPublisherSupport
 
     public static class NpmUtils
     {
+        public const string NpmCommandName = "npm.cmd";
+        
         private static readonly StringBuilder Error = new StringBuilder();
         private static readonly StringBuilder Output = new StringBuilder();
 
@@ -24,11 +27,13 @@ namespace NpmPublisherSupport
             if (WorkingDirectory == null)
                 throw new InvalidOperationException("WorkingDirectory is null");
 
+            var fileName = Path.Combine(NpmPublishPreferences.NodeJsLocation, NpmCommandName);
+            
             var startInfo = new System.Diagnostics.ProcessStartInfo
             {
                 Arguments = args,
                 CreateNoWindow = true,
-                FileName = "npm.cmd",
+                FileName = fileName,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
@@ -52,7 +57,7 @@ namespace NpmPublisherSupport
                 launchProcess.Exited += (sender, e) =>
                 {
                     IsNpmRunning = false;
-                    bool success = 0 == launchProcess.ExitCode;
+                    var success = 0 == launchProcess.ExitCode;
                     if (!success)
                     {
                         var err = Error.ToString();

@@ -35,6 +35,7 @@ namespace NpmPublisherSupport
         [SerializeField] private List<Loader> packageExternalLoaders = new List<Loader>();
 
         [SerializeField] private string registryInput = "";
+        [SerializeField] private string nodeJsPath = "";
         [SerializeField] private Vector2 packageJsonScroll;
 
         private void Refresh(bool force) => EditorApplication.delayCall += () => RefreshImmediate(force);
@@ -79,6 +80,8 @@ namespace NpmPublisherSupport
 
         private void OnEnable()
         {
+            nodeJsPath = NpmPublishPreferences.NodeJsLocation;
+            
             Selection.selectionChanged += OnSelectionChanged;
             NpmPublishAssetProcessor.PackageImported += PackageImported;
 
@@ -489,7 +492,11 @@ namespace NpmPublisherSupport
                 GUILayout.Label("No registry selected", Styles.CenteredLargeLabel);
                 GUILayout.Space(10);
                 GUILayout.Label("Registry:");
+                
                 registryInput = GUILayout.TextField(registryInput, GUILayout.MaxWidth(600)).Trim();
+                
+                GUILayout.Label("NodeJs Path:");
+                nodeJsPath = GUILayout.TextField(nodeJsPath, GUILayout.MaxWidth(600)).Trim();
 
                 var valid = true;
                 if (string.IsNullOrEmpty(registryInput))
@@ -514,6 +521,7 @@ namespace NpmPublisherSupport
                     if (GUILayout.Button("Confirm", GUILayout.Width(180), GUILayout.Height(24)))
                     {
                         NpmPublishPreferences.Registry = registryInput;
+                        NpmPublishPreferences.NodeJsLocation = nodeJsPath;
                         registryInput = string.Empty;
                     }
 
