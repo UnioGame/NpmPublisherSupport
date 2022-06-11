@@ -38,7 +38,7 @@ namespace NpmPublisherSupport
         public static bool OverrideNodeJsLocation
         {
             get => EditorPrefs.GetBool(OverrideNodeJsLocationKey,false);
-            set => EditorPrefs.GetBool(OverrideNodeJsLocationKey,value);
+            set => EditorPrefs.SetBool(OverrideNodeJsLocationKey,value);
         } 
 
         public static string[] AllRegistries

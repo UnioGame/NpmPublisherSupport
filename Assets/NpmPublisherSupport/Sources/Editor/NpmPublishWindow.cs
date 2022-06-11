@@ -496,7 +496,6 @@ namespace NpmPublisherSupport
                     nodeJsPath = GUILayout.TextField(nodeJsPath, GUILayout.MaxWidth(600)).Trim(); 
                 }
                 
-
                 var valid = true;
                 if (string.IsNullOrEmpty(registryInput))
                 {
