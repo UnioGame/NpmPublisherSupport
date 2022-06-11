@@ -27,7 +27,9 @@ namespace NpmPublisherSupport
             if (WorkingDirectory == null)
                 throw new InvalidOperationException("WorkingDirectory is null");
 
-            var fileName = Path.Combine(NpmPublishPreferences.NodeJsLocation, NpmCommandName);
+            var fileName = NpmPublishPreferences.OverrideNodeJsLocation
+                ? Path.Combine(NpmPublishPreferences.NodeJsLocation, NpmCommandName)
+                : NpmCommandName;
             
             var startInfo = new System.Diagnostics.ProcessStartInfo
             {
