@@ -35,6 +35,8 @@ namespace NpmPublisherSupport
         [SerializeField] private List<Loader> packageExternalLoaders = new List<Loader>();
 
         [SerializeField] private string registryInput = "";
+        [SerializeField] private string nodeJsPath = "";
+        [SerializeField] private bool overrideNodeJsPath = false;
         [SerializeField] private Vector2 packageJsonScroll;
 
         private void Refresh(bool force) => EditorApplication.delayCall += () => RefreshImmediate(force);
@@ -54,10 +56,10 @@ namespace NpmPublisherSupport
 
             var packageJsonObj = MiniJSON.Json.Deserialize(packageAsset.text);
             var packageJsonFormatted = MiniJSON.Json.Serialize(packageJsonObj);
-            packageJsonLines = packageJsonFormatted.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
+            packageJsonLines = packageJsonFormatted.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
 
             packageExternalLoaders = AssetDatabase
-                .FindAssets($"t:{typeof(Loader).FullName}", new[] {Path.GetDirectoryName(path)})
+                .FindAssets($"t:{typeof(Loader).FullName}", new[] { Path.GetDirectoryName(path) })
                 .Select(AssetDatabase.GUIDToAssetPath)
                 .Select(AssetDatabase.LoadAssetAtPath<Loader>)
                 .ToList();
@@ -79,6 +81,9 @@ namespace NpmPublisherSupport
 
         private void OnEnable()
         {
+            nodeJsPath = NpmPublishPreferences.NodeJsLocation;
+            overrideNodeJsPath = NpmPublishPreferences.OverrideNodeJsLocation;
+
             Selection.selectionChanged += OnSelectionChanged;
             NpmPublishAssetProcessor.PackageImported += PackageImported;
 
@@ -99,11 +104,11 @@ namespace NpmPublisherSupport
         private void OnSelectionChanged()
         {
             var newPackageJson = NpmPublishMenu.GetSelectedPackageJson();
-            if (newPackageJson != null && newPackageJson != packageAsset)
-            {
-                packageAsset = newPackageJson;
-                RefreshImmediate(false);
-            }
+            
+            if (newPackageJson == null || newPackageJson == packageAsset) return;
+            
+            packageAsset = newPackageJson;
+            RefreshImmediate(false);
         }
 
         private void PackageImported()
@@ -132,14 +137,10 @@ namespace NpmPublisherSupport
             EditorGUI.BeginChangeCheck();
             DrawToolbar();
             if (EditorGUI.EndChangeCheck())
-            {
                 return;
-            }
 
             if (!userFetched)
-            {
                 FetchUser();
-            }
 
             if (string.IsNullOrEmpty(user))
             {
@@ -164,19 +165,13 @@ namespace NpmPublisherSupport
             GUILayout.Space(10);
 
             if (DrawPackageExternalLoaders())
-            {
                 GUILayout.Space(10);
-            }
-
+            
             if (DrawPublishConfig())
-            {
                 GUILayout.Space(10);
-            }
-
+            
             if (GUILayout.Button("Publish", GUILayout.Height(24)))
-            {
                 DoPublish();
-            }
         }
 
         private void DoPublish()
@@ -330,7 +325,7 @@ namespace NpmPublisherSupport
             {
                 EditorGUILayout.PrefixLabel("Increment Version");
 
-                var options = new[] {GUILayout.MaxWidth(110)};
+                var options = new[] { GUILayout.MaxWidth(110) };
 
                 if (GUILayout.Button("Major 1.0.0", EditorStyles.miniButtonLeft, options))
                     UpdateVersion(NpmVersion.Major);
@@ -489,7 +484,18 @@ namespace NpmPublisherSupport
                 GUILayout.Label("No registry selected", Styles.CenteredLargeLabel);
                 GUILayout.Space(10);
                 GUILayout.Label("Registry:");
+
                 registryInput = GUILayout.TextField(registryInput, GUILayout.MaxWidth(600)).Trim();
+
+                GUILayout.Space(10);
+                
+                overrideNodeJsPath = EditorGUILayout.Toggle("Override NodeJs Path", overrideNodeJsPath);
+                if (overrideNodeJsPath)
+                {
+                    GUILayout.Label("NodeJs Path:");
+                    nodeJsPath = GUILayout.TextField(nodeJsPath, GUILayout.MaxWidth(600)).Trim(); 
+                }
+                
 
                 var valid = true;
                 if (string.IsNullOrEmpty(registryInput))
@@ -507,19 +513,24 @@ namespace NpmPublisherSupport
                 }
 
                 GUILayout.Space(10);
-                using (new GUILayout.HorizontalScope())
-                using (new EditorGUI.DisabledScope(!valid))
-                {
-                    GUILayout.FlexibleSpace();
-                    if (GUILayout.Button("Confirm", GUILayout.Width(180), GUILayout.Height(24)))
-                    {
-                        NpmPublishPreferences.Registry = registryInput;
-                        registryInput = string.Empty;
-                    }
+                using var horizontalScope = new GUILayout.HorizontalScope();
+                using var disabledScope = new EditorGUI.DisabledScope(!valid);
 
-                    GUILayout.FlexibleSpace();
-                }
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button("Confirm", GUILayout.Width(180), GUILayout.Height(24)))
+                    ApplyConfiguration();
+                GUILayout.FlexibleSpace();
+                
             });
+        }
+
+        private void ApplyConfiguration()
+        {
+            NpmPublishPreferences.Registry = registryInput;
+            NpmPublishPreferences.NodeJsLocation = overrideNodeJsPath ? nodeJsPath : string.Empty;
+            NpmPublishPreferences.OverrideNodeJsLocation = overrideNodeJsPath;
+
+            registryInput = string.Empty;
         }
 
         private void DrawNotLoggedIn()
