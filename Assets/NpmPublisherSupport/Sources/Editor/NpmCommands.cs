@@ -33,14 +33,11 @@ namespace NpmPublisherSupport
         
         public static void Publish(NpmCommandCallback action, string registry)
         {
-            if (string.IsNullOrEmpty(registry))
-            {
-                NpmUtils.ExecuteNpmCommand($"publish ", action);
-            }
-            else
-            {
-                NpmUtils.ExecuteNpmCommand($"publish --registry {registry}", action);
-            }
+            var command = string.IsNullOrEmpty(registry) 
+                ? $"publish " 
+                : $"publish --registry {registry}";
+            
+            NpmUtils.ExecuteNpmCommand(command,action);
         }
 
         public static void UpdatePatchVersionRecursively(TextAsset package)

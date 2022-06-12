@@ -178,11 +178,12 @@ namespace NpmPublisherSupport
         {
             var header = $"Npm: {Registry}";
             var msg = $"Are you really want to publish package {package.name}: {package.version}?";
-            if (!EditorUtility.DisplayDialog(header, msg, "Publish", "Cancel")) return;
+            
+            if (!EditorUtility.DisplayDialog(header, msg, "Publish", "Cancel")) 
+                return;
 
             NpmPublishCommand.Execute(packageAsset, () =>
             {
-                //
                 UpmClientUtils.ListPackages(() => Refresh(false));
             });
         }

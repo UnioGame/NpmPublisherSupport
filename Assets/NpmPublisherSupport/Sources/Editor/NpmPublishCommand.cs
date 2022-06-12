@@ -18,21 +18,18 @@ namespace NpmPublisherSupport
             });
         }
 
-        public static void Execute(TextAsset packageJsonAsset, Action callback,
+        public static void Execute(TextAsset packageJsonAsset, 
+            Action callback,
             NpmPublishCommandOptions options)
         {
             NpmCommands.SetWorkingDirectory(packageJsonAsset);
 
             if (options.CopyDocumentation)
-            {
                 CopyDirectoryIfExists(packageJsonAsset, "Documentation", "Documentation~");
-            }
-
+            
             if (options.CopySamples)
-            {
                 CopyDirectoryIfExists(packageJsonAsset, "Samples", "Samples~");
-            }
-
+            
             var packageJsonPath = AssetDatabase.GetAssetPath(packageJsonAsset);
             var packageExternalLoaders = AssetDatabase
                 .FindAssets($"t:{typeof(Loader).FullName}", new[] {Path.GetDirectoryName(packageJsonPath)})

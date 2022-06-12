@@ -13,13 +13,12 @@ namespace NpmPublisherSupport
             if (PackageImported == null)
                 return;
 
-            foreach (string asset in importedAssets)
+            foreach (var asset in importedAssets)
             {
-                if (asset.StartsWith("Assets/") && asset.EndsWith("/package.json"))
-                {
-                    PackageImported.Invoke();
-                    return;
-                }
+                if (!asset.StartsWith("Assets/") || !asset.EndsWith("/package.json")) 
+                    continue;
+                PackageImported.Invoke();
+                return;
             }
         }
     }
