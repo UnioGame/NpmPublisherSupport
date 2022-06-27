@@ -139,6 +139,7 @@ namespace NpmPublisherSupport
 
                     var request = UnityWebRequest.Get(registry + package.name);
                     request.SendWebRequest();
+                    
                     while (!request.isDone)
                     {
                         yield return null;
